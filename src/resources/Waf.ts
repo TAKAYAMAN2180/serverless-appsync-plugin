@@ -107,7 +107,25 @@ export class Waf {
 
     const action: WafRuleAction = rule.action || 'Allow';
 
-    const result: CfnWafRule = {
+    let result: any;
+    
+    if('ManagedRuleGroupStatement' in obj.statement) {
+    result = {
+      Name: rule.name,
+      Action: { [action]: {} },
+      Priority: rule.priority,
+      Statement: rule.statement,
+      VisibilityConfig: this.getWafVisibilityConfig(
+        rule.visibilityConfig,
+        rule.name,
+      ),
+      OverrideAction: {
+          None: {}
+      }
+    };
+      
+    } else {
+    result = {
       Name: rule.name,
       Action: { [action]: {} },
       Priority: rule.priority,
@@ -117,6 +135,7 @@ export class Waf {
         rule.name,
       ),
     };
+    }
 
     return result;
   }
